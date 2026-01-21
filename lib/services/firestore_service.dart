@@ -1,3 +1,4 @@
+import 'package:cloture/utils/logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirestoreService {
@@ -19,7 +20,7 @@ class FirestoreService {
       }).toList();
       return fetchedCategories;
     } catch (e) {
-      print('Error fetching categories: $e');
+      AppLogger.error('Error fetching categories', e);
       return [];
     }
   }
@@ -43,7 +44,7 @@ class FirestoreService {
           .toList();
       return fetchedTopSellingProducts;
     } catch (e) {
-      print('Error fetching top-selling products: $e');
+      AppLogger.error('Error fetching top-selling products', e);
       return [];
     }
   }
@@ -67,7 +68,7 @@ class FirestoreService {
       }).toList();
       return fetchedNewInProducts;
     } catch (e) {
-      print('Error fetching new-in products: $e');
+      AppLogger.error('Error fetching new-in products', e);
       return [];
     }
   }

@@ -10,6 +10,7 @@ import 'package:cloture/view/constants/text.dart';
 import 'package:cloture/view/constants/textfield.dart';
 import 'package:cloture/controller/cart_controller.dart';
 import 'package:cloture/controller/favorites_controller.dart';
+import 'package:cloture/utils/logger.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -99,11 +100,11 @@ class _SigninScreenState extends State<SigninScreen> {
     } catch (e) {
       // Handle Firebase-specific errors
       if (e is FirebaseAuthException) {
-        print('FirebaseAuthException: ${e.message}');
+        AppLogger.error('FirebaseAuthException', e, StackTrace.current);
         toastError(msg: 'FirebaseAuth error: ${e.message ?? 'Unknown error'}');
       } else {
         // Handle other errors
-        print('Error: $e');
+        AppLogger.error('Error during sign in', e, StackTrace.current);
         toastError(msg: 'An unexpected error occurred: $e');
       }
       setState(() {

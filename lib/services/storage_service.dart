@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cloture/utils/logger.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,7 +23,7 @@ class StorageService {
     try {
       await _secureStorage.write(key: key, value: value);
     } catch (e) {
-      print('Error saving secure storage: $e');
+      AppLogger.error('Error saving secure storage', e);
     }
   }
 
@@ -31,7 +32,7 @@ class StorageService {
     try {
       return await _secureStorage.read(key: key);
     } catch (e) {
-      print('Error reading secure storage: $e');
+      AppLogger.error('Error reading secure storage', e);
       return null;
     }
   }
@@ -41,7 +42,7 @@ class StorageService {
     try {
       await _secureStorage.delete(key: key);
     } catch (e) {
-      print('Error deleting secure storage: $e');
+      AppLogger.error('Error deleting secure storage', e);
     }
   }
 
@@ -50,7 +51,7 @@ class StorageService {
     try {
       await _secureStorage.deleteAll();
     } catch (e) {
-      print('Error deleting all secure storage: $e');
+      AppLogger.error('Error deleting all secure storage', e);
     }
   }
 
@@ -62,7 +63,7 @@ class StorageService {
       final prefs = await SharedPreferences.getInstance();
       return await prefs.setString(key, value);
     } catch (e) {
-      print('Error saving string: $e');
+      AppLogger.error('Error saving string', e);
       return false;
     }
   }
@@ -73,7 +74,7 @@ class StorageService {
       final prefs = await SharedPreferences.getInstance();
       return prefs.getString(key);
     } catch (e) {
-      print('Error reading string: $e');
+      AppLogger.error('Error reading string', e);
       return null;
     }
   }
@@ -84,7 +85,7 @@ class StorageService {
       final prefs = await SharedPreferences.getInstance();
       return await prefs.setStringList(key, value);
     } catch (e) {
-      print('Error saving string list: $e');
+      AppLogger.error('Error saving string list', e);
       return false;
     }
   }
@@ -95,7 +96,7 @@ class StorageService {
       final prefs = await SharedPreferences.getInstance();
       return prefs.getStringList(key);
     } catch (e) {
-      print('Error reading string list: $e');
+      AppLogger.error('Error reading string list', e);
       return null;
     }
   }
@@ -106,7 +107,7 @@ class StorageService {
       final prefs = await SharedPreferences.getInstance();
       return await prefs.setBool(key, value);
     } catch (e) {
-      print('Error saving bool: $e');
+      AppLogger.error('Error saving bool', e);
       return false;
     }
   }
@@ -117,7 +118,7 @@ class StorageService {
       final prefs = await SharedPreferences.getInstance();
       return prefs.getBool(key);
     } catch (e) {
-      print('Error reading bool: $e');
+      AppLogger.error('Error reading bool', e);
       return null;
     }
   }
@@ -129,9 +130,9 @@ class StorageService {
       final jsonString = jsonEncode(value);
       return await prefs.setString(key, jsonString);
     } catch (e) {
-      print('Error saving JSON: $e');
+      AppLogger.error('Error saving JSON', e);
       return false;
-    }
+}
   }
 
   /// Read a JSON-serializable object
@@ -142,7 +143,7 @@ class StorageService {
       if (jsonString == null) return null;
       return jsonDecode(jsonString) as Map<String, dynamic>;
     } catch (e) {
-      print('Error reading JSON: $e');
+      AppLogger.error('Error reading JSON', e);
       return null;
     }
   }
@@ -154,7 +155,7 @@ class StorageService {
       final jsonList = value.map((item) => jsonEncode(item)).toList();
       return await prefs.setStringList(key, jsonList);
     } catch (e) {
-      print('Error saving JSON list: $e');
+      AppLogger.error('Error saving JSON list', e);
       return false;
     }
   }
@@ -169,7 +170,7 @@ class StorageService {
           .map((jsonString) => jsonDecode(jsonString) as Map<String, dynamic>)
           .toList();
     } catch (e) {
-      print('Error reading JSON list: $e');
+      AppLogger.error('Error reading JSON list', e);
       return null;
     }
   }
@@ -180,7 +181,7 @@ class StorageService {
       final prefs = await SharedPreferences.getInstance();
       return await prefs.remove(key);
     } catch (e) {
-      print('Error deleting: $e');
+      AppLogger.error('Error deleting', e);
       return false;
     }
   }
@@ -191,7 +192,7 @@ class StorageService {
       final prefs = await SharedPreferences.getInstance();
       return await prefs.clear();
     } catch (e) {
-      print('Error clearing: $e');
+      AppLogger.error('Error clearing', e);
       return false;
     }
   }

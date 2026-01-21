@@ -2,6 +2,7 @@ import 'package:cloture/model/favorite_item.dart';
 import 'package:cloture/services/favorites_service.dart';
 import 'package:cloture/services/auth_service.dart';
 import 'package:cloture/services/connectivity_service.dart';
+import 'package:cloture/utils/logger.dart';
 import 'package:flutter/foundation.dart';
 
 class FavoritesController extends ChangeNotifier {
@@ -48,7 +49,7 @@ class FavoritesController extends ChangeNotifier {
       // Load favorites (from Firestore if online, cache if offline)
       _favoriteItems = await _favoritesService.getFavorites(user.uid);
     } catch (e) {
-      print('Error loading favorites: $e');
+      AppLogger.error('Error loading favorites', e);
       _favoriteItems = [];
     } finally {
       _isLoading = false;
@@ -69,7 +70,7 @@ class FavoritesController extends ChangeNotifier {
         _updateCache();
       },
       onError: (e) {
-        print('Error listening to favorites: $e');
+        AppLogger.error('Error listening to favorites', e);
       },
     );
   }
@@ -101,7 +102,7 @@ class FavoritesController extends ChangeNotifier {
       }
       return success;
     } catch (e) {
-      print('Error adding to favorites: $e');
+      AppLogger.error('Error adding to favorites', e);
       return false;
     }
   }
@@ -125,7 +126,7 @@ class FavoritesController extends ChangeNotifier {
       }
       return success;
     } catch (e) {
-      print('Error removing favorite: $e');
+      AppLogger.error('Error removing favorite', e);
       return false;
     }
   }
@@ -149,7 +150,7 @@ class FavoritesController extends ChangeNotifier {
       }
       return success;
     } catch (e) {
-      print('Error removing favorite by productId: $e');
+      AppLogger.error('Error removing favorite by productId', e);
       return false;
     }
   }
@@ -189,7 +190,7 @@ class FavoritesController extends ChangeNotifier {
       // Then check Firestore/cache
       return await _favoritesService.isFavorite(user.uid, productId);
     } catch (e) {
-      print('Error checking if favorite: $e');
+      AppLogger.error('Error checking if favorite', e);
       return false;
     }
   }
@@ -207,7 +208,7 @@ class FavoritesController extends ChangeNotifier {
       }
       return success;
     } catch (e) {
-      print('Error clearing favorites: $e');
+      AppLogger.error('Error clearing favorites', e);
       return false;
     }
   }

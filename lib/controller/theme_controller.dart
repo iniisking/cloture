@@ -1,10 +1,11 @@
+import 'package:cloture/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ThemeController extends ChangeNotifier {
   bool _isDarkMode;
   bool get isDarkMode => _isDarkMode;
-  
+
   static const String _themeKey = 'is_dark_mode';
 
   ThemeController({bool initialTheme = false}) : _isDarkMode = initialTheme {
@@ -23,7 +24,7 @@ class ThemeController extends ChangeNotifier {
     } catch (e) {
       // If there's an error loading, keep current state
       // This can happen during hot reload or if the plugin isn't ready
-      print('Error loading theme (non-critical): $e');
+      AppLogger.warning('Error loading theme (non-critical): $e');
     }
   }
 
@@ -34,7 +35,7 @@ class ThemeController extends ChangeNotifier {
     } catch (e) {
       // Silently handle save errors - theme will still work, just won't persist
       // This can happen during hot reload or if the plugin isn't ready
-      print('Error saving theme (non-critical): $e');
+      AppLogger.warning('Error saving theme (non-critical): $e');
     }
   }
 

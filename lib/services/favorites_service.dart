@@ -1,3 +1,4 @@
+import 'package:cloture/utils/logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloture/model/favorite_item.dart';
 import 'package:cloture/services/storage_service.dart';
@@ -39,7 +40,7 @@ class FavoritesService {
       await _updateLocalCache(userId);
       return true;
     } catch (e) {
-      print('Error adding to favorites: $e');
+      AppLogger.error('Error adding to favorites', e);
       // Still update local cache on error
       await _updateLocalCache(userId);
       return false;
@@ -59,7 +60,7 @@ class FavoritesService {
       await _updateLocalCache(userId);
       return true;
     } catch (e) {
-      print('Error removing from favorites: $e');
+      AppLogger.error('Error removing from favorites', e);
       await _updateLocalCache(userId);
       return false;
     }
@@ -85,7 +86,7 @@ class FavoritesService {
       await _updateLocalCache(userId);
       return true;
     } catch (e) {
-      print('Error removing from favorites by productId: $e');
+      AppLogger.error('Error removing from favorites by productId', e);
       await _updateLocalCache(userId);
       return false;
     }
@@ -109,7 +110,7 @@ class FavoritesService {
         return cachedFavorites.any((item) => item.productId == productId);
       }
     } catch (e) {
-      print('Error checking if favorite: $e');
+      AppLogger.error('Error checking if favorite', e);
       return false;
     }
   }
@@ -134,7 +135,7 @@ class FavoritesService {
       await _storageService.saveJsonList(_getFavoritesCacheKey(userId), []);
       return true;
     } catch (e) {
-      print('Error clearing favorites: $e');
+      AppLogger.error('Error clearing favorites', e);
       await _storageService.saveJsonList(_getFavoritesCacheKey(userId), []);
       return false;
     }
@@ -180,7 +181,7 @@ class FavoritesService {
         return await getCachedFavorites(userId);
       }
     } catch (e) {
-      print('Error getting favorites: $e');
+      AppLogger.error('Error getting favorites', e);
       // Return cached data on error
       return await getCachedFavorites(userId);
     }
@@ -196,7 +197,7 @@ class FavoritesService {
       
       return cachedData.map((map) => FavoriteItem.fromMap(map)).toList();
     } catch (e) {
-      print('Error getting cached favorites: $e');
+      AppLogger.error('Error getting cached favorites', e);
       return [];
     }
   }
@@ -207,7 +208,7 @@ class FavoritesService {
       final favorites = await getFavorites(userId);
       await _saveLocalCache(userId, favorites);
     } catch (e) {
-      print('Error updating local cache: $e');
+      AppLogger.error('Error updating local cache', e);
     }
   }
 
@@ -218,7 +219,7 @@ class FavoritesService {
       final itemsMap = items.map((item) => item.toMap()).toList();
       await _storageService.saveJsonList(cacheKey, itemsMap);
     } catch (e) {
-      print('Error saving local cache: $e');
+      AppLogger.error('Error saving local cache', e);
     }
   }
 
@@ -248,7 +249,7 @@ class FavoritesService {
 
       await batch.commit();
     } catch (e) {
-      print('Error syncing favorites to Firestore: $e');
+      AppLogger.error('Error syncing favorites to Firestore', e);
     }
   }
 }

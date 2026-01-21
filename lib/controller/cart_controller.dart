@@ -1,7 +1,10 @@
+// ignore_for_file: prefer_final_fields
+
 import 'package:cloture/model/cart_item.dart';
 import 'package:cloture/services/cart_service.dart';
 import 'package:cloture/services/auth_service.dart';
 import 'package:cloture/services/connectivity_service.dart';
+import 'package:cloture/utils/logger.dart';
 import 'package:flutter/foundation.dart';
 
 class CartController extends ChangeNotifier {
@@ -9,9 +12,9 @@ class CartController extends ChangeNotifier {
     required CartService cartService,
     required AuthService authService,
     ConnectivityService? connectivityService,
-  })  : _cartService = cartService,
-        _authService = authService,
-        _connectivityService = connectivityService ?? ConnectivityService();
+  }) : _cartService = cartService,
+       _authService = authService,
+       _connectivityService = connectivityService ?? ConnectivityService();
 
   final CartService _cartService;
   final AuthService _authService;
@@ -27,10 +30,8 @@ class CartController extends ChangeNotifier {
 
   // Calculated properties
   int get totalItems => _cartItems.fold(0, (sum, item) => sum + item.quantity);
-  double get subtotal => _cartItems.fold(
-        0.0,
-        (sum, item) => sum + (item.price * item.quantity),
-      );
+  double get subtotal =>
+      _cartItems.fold(0.0, (sum, item) => sum + (item.price * item.quantity));
   double get tax => subtotal * 0.0; // 0% tax for now
   double get shippingCost => 8.00;
   double get total => subtotal + shippingCost + tax;
@@ -57,7 +58,7 @@ class CartController extends ChangeNotifier {
       // Load cart (from Firestore if online, cache if offline)
       _cartItems = await _cartService.getCart(user.uid);
     } catch (e) {
-      print('Error loading cart: $e');
+      AppLogger.error('Error loading cart', e);
       _cartItems = [];
     } finally {
       _isLoading = false;
@@ -70,17 +71,19 @@ class CartController extends ChangeNotifier {
     final user = _authService.currentUser;
     if (user == null) return;
 
-    _cartService.getCartStream(user.uid).listen(
-      (items) {
-        _cartItems = items;
-        notifyListeners();
-        // Update cache
-        _updateCache();
-      },
-      onError: (e) {
-        print('Error listening to cart: $e');
-      },
-    );
+    _cartService
+        .getCartStream(user.uid)
+        .listen(
+          (items) {
+            _cartItems = items;
+            notifyListeners();
+            // Update cache
+            _updateCache();
+          },
+          onError: (e) {
+            AppLogger.error('Error listening to cart', e);
+          },
+        );
   }
 
   /// Add item to cart
@@ -116,7 +119,7 @@ class CartController extends ChangeNotifier {
       }
       return success;
     } catch (e) {
-      print('Error adding to cart: $e');
+      AppLogger.error('Error adding to cart', e);
       return false;
     }
   }
@@ -137,7 +140,7 @@ class CartController extends ChangeNotifier {
       }
       return success;
     } catch (e) {
-      print('Error removing item: $e');
+      AppLogger.error('Error removing item', e);
       return false;
     }
   }
@@ -160,7 +163,9 @@ class CartController extends ChangeNotifier {
           if (newQuantity <= 0) {
             _cartItems.removeAt(index);
           } else {
-            _cartItems[index] = _cartItems[index].copyWith(quantity: newQuantity);
+            _cartItems[index] = _cartItems[index].copyWith(
+              quantity: newQuantity,
+            );
           }
           notifyListeners();
         }
@@ -169,7 +174,7 @@ class CartController extends ChangeNotifier {
       }
       return success;
     } catch (e) {
-      print('Error updating quantity: $e');
+      AppLogger.error('Error updating quantity', e);
       return false;
     }
   }
@@ -187,7 +192,7 @@ class CartController extends ChangeNotifier {
       }
       return success;
     } catch (e) {
-      print('Error clearing cart: $e');
+      AppLogger.error('Error clearing cart', e);
       return false;
     }
   }
@@ -200,7 +205,7 @@ class CartController extends ChangeNotifier {
     try {
       return await _cartService.getCartItemCount(user.uid);
     } catch (e) {
-      print('Error getting cart count: $e');
+      AppLogger.error('Error getting cart count', e);
       return totalItems; // Fallback to local count
     }
   }

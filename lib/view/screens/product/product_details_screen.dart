@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_brace_in_string_interps, deprecated_member_use
+
 import 'package:cloture/view/constants/colors.dart';
 import 'package:cloture/view/constants/text.dart';
 import 'package:cloture/view/constants/theme_colors.dart';

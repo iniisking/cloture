@@ -1,3 +1,6 @@
+// ignore_for_file: avoid_types_as_parameter_names
+
+import 'package:cloture/utils/logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloture/model/cart_item.dart';
 import 'package:cloture/services/storage_service.dart';
@@ -20,7 +23,7 @@ class CartService {
   Future<bool> addToCart(String userId, CartItem item) async {
     try {
       final isConnected = await _connectivityService.isConnected();
-      
+
       if (isConnected) {
         // Check if item with same productId, size, color exists
         final querySnapshot = await _getCartCollection(userId)
@@ -33,9 +36,10 @@ class CartService {
         if (querySnapshot.docs.isNotEmpty) {
           // Item exists, update quantity
           final docId = querySnapshot.docs.first.id;
-          final existingData = querySnapshot.docs.first.data() as Map<String, dynamic>;
+          final existingData =
+              querySnapshot.docs.first.data() as Map<String, dynamic>;
           final existingQuantity = existingData['quantity'] as int;
-          
+
           await _getCartCollection(userId).doc(docId).update({
             'quantity': existingQuantity + item.quantity,
             'timestamp': DateTime.now().toIso8601String(),
@@ -45,12 +49,12 @@ class CartService {
           await _getCartCollection(userId).add(item.toFirestore());
         }
       }
-      
+
       // Always update local cache (optimistic update)
       await _updateLocalCache(userId);
       return true;
     } catch (e) {
-      print('Error adding to cart: $e');
+      AppLogger.error('Error adding to cart', e);
       // Still update local cache on error
       await _updateLocalCache(userId);
       return false;
@@ -61,16 +65,16 @@ class CartService {
   Future<bool> removeFromCart(String userId, String cartItemId) async {
     try {
       final isConnected = await _connectivityService.isConnected();
-      
+
       if (isConnected) {
         await _getCartCollection(userId).doc(cartItemId).delete();
       }
-      
+
       // Update local cache
       await _updateLocalCache(userId);
       return true;
     } catch (e) {
-      print('Error removing from cart: $e');
+      AppLogger.error('Error removing from cart', e);
       await _updateLocalCache(userId);
       return false;
     }
@@ -88,19 +92,19 @@ class CartService {
       }
 
       final isConnected = await _connectivityService.isConnected();
-      
+
       if (isConnected) {
         await _getCartCollection(userId).doc(cartItemId).update({
           'quantity': newQuantity,
           'timestamp': DateTime.now().toIso8601String(),
         });
       }
-      
+
       // Update local cache
       await _updateLocalCache(userId);
       return true;
     } catch (e) {
-      print('Error updating quantity: $e');
+      AppLogger.error('Error updating quantity', e);
       await _updateLocalCache(userId);
       return false;
     }
@@ -110,23 +114,23 @@ class CartService {
   Future<bool> clearCart(String userId) async {
     try {
       final isConnected = await _connectivityService.isConnected();
-      
+
       if (isConnected) {
         final batch = _firestore.batch();
         final snapshot = await _getCartCollection(userId).get();
-        
+
         for (var doc in snapshot.docs) {
           batch.delete(doc.reference);
         }
-        
+
         await batch.commit();
       }
-      
+
       // Clear local cache
       await _storageService.saveJsonList(_getCartCacheKey(userId), []);
       return true;
     } catch (e) {
-      print('Error clearing cart: $e');
+      AppLogger.error('Error clearing cart', e);
       await _storageService.saveJsonList(_getCartCacheKey(userId), []);
       return false;
     }
@@ -134,12 +138,14 @@ class CartService {
 
   /// Get user's cart as a stream (real-time updates)
   Stream<List<CartItem>> getCartStream(String userId) {
-    return _getCartCollection(userId)
-        .orderBy('timestamp', descending: true)
-        .snapshots()
-        .map((snapshot) {
+    return _getCartCollection(
+      userId,
+    ).orderBy('timestamp', descending: true).snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
-        return CartItem.fromFirestore(doc.id, doc.data() as Map<String, dynamic>);
+        return CartItem.fromFirestore(
+          doc.id,
+          doc.data() as Map<String, dynamic>,
+        );
       }).toList();
     });
   }
@@ -148,19 +154,19 @@ class CartService {
   Future<List<CartItem>> getCart(String userId) async {
     try {
       final isConnected = await _connectivityService.isConnected();
-      
+
       if (isConnected) {
-        final snapshot = await _getCartCollection(userId)
-            .orderBy('timestamp', descending: true)
-            .get();
-        
+        final snapshot = await _getCartCollection(
+          userId,
+        ).orderBy('timestamp', descending: true).get();
+
         final items = snapshot.docs.map((doc) {
           return CartItem.fromFirestore(
             doc.id,
             doc.data() as Map<String, dynamic>,
           );
         }).toList();
-        
+
         // Update local cache
         await _saveLocalCache(userId, items);
         return items;
@@ -169,7 +175,7 @@ class CartService {
         return await getCachedCart(userId);
       }
     } catch (e) {
-      print('Error getting cart: $e');
+      AppLogger.error('Error getting cart', e);
       // Return cached data on error
       return await getCachedCart(userId);
     }
@@ -180,12 +186,12 @@ class CartService {
     try {
       final cacheKey = _getCartCacheKey(userId);
       final cachedData = await _storageService.readJsonList(cacheKey);
-      
+
       if (cachedData == null) return [];
-      
+
       return cachedData.map((map) => CartItem.fromMap(map)).toList();
     } catch (e) {
-      print('Error getting cached cart: $e');
+      AppLogger.error('Error getting cached cart', e);
       return [];
     }
   }
@@ -196,7 +202,7 @@ class CartService {
       final cart = await getCart(userId);
       return cart.fold<int>(0, (sum, item) => sum + item.quantity);
     } catch (e) {
-      print('Error getting cart count: $e');
+      AppLogger.error('Error getting cart count', e);
       return 0;
     }
   }
@@ -207,7 +213,7 @@ class CartService {
       final cart = await getCart(userId);
       await _saveLocalCache(userId, cart);
     } catch (e) {
-      print('Error updating local cache: $e');
+      AppLogger.error('Error updating local cache', e);
     }
   }
 
@@ -218,7 +224,7 @@ class CartService {
       final itemsMap = items.map((item) => item.toMap()).toList();
       await _storageService.saveJsonList(cacheKey, itemsMap);
     } catch (e) {
-      print('Error saving local cache: $e');
+      AppLogger.error('Error saving local cache', e);
     }
   }
 
@@ -248,7 +254,7 @@ class CartService {
 
       await batch.commit();
     } catch (e) {
-      print('Error syncing cart to Firestore: $e');
+      AppLogger.error('Error syncing cart to Firestore', e);
     }
   }
 }

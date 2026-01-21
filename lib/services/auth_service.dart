@@ -1,5 +1,6 @@
-// ignore_for_file: avoid_print, avoid_returning_null_for_void
+// ignore_for_file: avoid_returning_null_for_void
 
+import 'package:cloture/utils/logger.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService {
@@ -14,7 +15,7 @@ class AuthService {
       );
       return result.user;
     } catch (e) {
-      print(e.toString());
+      AppLogger.error('Error signing in with email', e);
       return null;
     }
   }
@@ -39,7 +40,7 @@ class AuthService {
 
       return user;
     } catch (e) {
-      print(e.toString());
+      AppLogger.error('Error registering with email', e);
       return null;
     }
   }
@@ -49,7 +50,7 @@ class AuthService {
     try {
       return await _auth.signOut();
     } catch (e) {
-      print(e.toString());
+      AppLogger.error('Error signing out', e);
       return null;
     }
   }

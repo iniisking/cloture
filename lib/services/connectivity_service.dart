@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cloture/utils/logger.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 /// Service to monitor network connectivity
@@ -21,14 +22,14 @@ class ConnectivityService {
           _connectionController?.add(isConnected);
         },
         onError: (error) {
-          print('Connectivity stream error: $error');
+          AppLogger.error('Connectivity stream error', error);
           // Assume connected if we can't determine status
           _connectionController?.add(true);
         },
       );
       _isInitialized = true;
     } catch (e) {
-      print('Error initializing connectivity service: $e');
+      AppLogger.error('Error initializing connectivity service', e);
       // If initialization fails, assume connected (fail open)
       _connectionController?.add(true);
       _isInitialized = false;
@@ -53,7 +54,7 @@ class ConnectivityService {
       final results = await _connectivity.checkConnectivity();
       return _hasConnection(results);
     } catch (e) {
-      print('Error checking connectivity: $e');
+      AppLogger.error('Error checking connectivity', e);
       // Fail open - assume connected if we can't determine
       return true;
     }

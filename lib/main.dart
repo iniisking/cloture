@@ -6,6 +6,7 @@ import 'package:cloture/controller/favorites_controller.dart';
 import 'package:cloture/services/auth_service.dart';
 import 'package:cloture/services/cart_service.dart';
 import 'package:cloture/services/favorites_service.dart';
+import 'package:cloture/utils/logger.dart';
 import 'package:cloture/view/constants/colors.dart';
 import 'package:cloture/view/screens/authentication/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -17,6 +18,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Logger
+  await AppLogger.initialize();
 
   // Initialize Firebase
   await Firebase.initializeApp();
@@ -31,7 +35,7 @@ void main() async {
     isDarkMode = prefs.getBool('is_dark_mode') ?? false;
   } catch (e) {
     // If SharedPreferences fails to initialize, default to light mode
-    debugPrint('Error loading theme preference: $e');
+    AppLogger.error('Error loading theme preference', e);
     isDarkMode = false;
   }
 

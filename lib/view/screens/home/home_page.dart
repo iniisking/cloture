@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_brace_in_string_interps
+
 import 'package:cloture/gen/assets.gen.dart';
 import 'package:cloture/view/screens/home/categories_men.dart';
 import 'package:cloture/view/screens/home/new_in.dart';

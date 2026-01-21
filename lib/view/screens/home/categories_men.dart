@@ -1,3 +1,4 @@
+import 'package:cloture/utils/logger.dart';
 import 'package:cloture/view/widgets/buttons.dart';
 import 'package:cloture/view/constants/text.dart';
 import 'package:cloture/view/constants/theme_colors.dart';
@@ -51,7 +52,7 @@ class _CategoriesMenState extends State<CategoriesMen> {
         });
       }
     } catch (e) {
-      print('Error fetching categories: $e');
+      AppLogger.error('Error fetching categories', e);
     }
   }
 
@@ -84,65 +85,80 @@ class _CategoriesMenState extends State<CategoriesMen> {
                     TextAlign.left,
                   ),
 
-              SizedBox(height: 12.spMin),
+                  SizedBox(height: 12.spMin),
 
-              // Dynamic content based on categories
-              Expanded(
-                child: categories.isEmpty
-                    ? ListView.builder(
-                        itemCount: 6, // Number of shimmer placeholders
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: EdgeInsets.symmetric(vertical: 4.spMin),
-                            child: shopByCategoriesShimmerEffect(themeColors: themeColors),
-                          );
-                        },
-                      )
-                    : ListView.builder(
-                        padding: EdgeInsets.zero,
-                        itemCount: categories.length,
-                        itemBuilder: (context, index) {
-                          String categoryName = categories[index]['name']!;
-                          String imageUrl = categories[index]['imageUrl']!;
+                  // Dynamic content based on categories
+                  Expanded(
+                    child: categories.isEmpty
+                        ? ListView.builder(
+                            itemCount: 6, // Number of shimmer placeholders
+                            itemBuilder: (context, index) {
+                              return Padding(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 4.spMin,
+                                ),
+                                child: shopByCategoriesShimmerEffect(
+                                  themeColors: themeColors,
+                                ),
+                              );
+                            },
+                          )
+                        : ListView.builder(
+                            padding: EdgeInsets.zero,
+                            itemCount: categories.length,
+                            itemBuilder: (context, index) {
+                              String categoryName = categories[index]['name']!;
+                              String imageUrl = categories[index]['imageUrl']!;
 
-                          return Padding(
-                            padding: EdgeInsets.symmetric(vertical: 8.spMin),
-                            child: Container(
-                              padding: EdgeInsets.symmetric(vertical: 12.spMin),
-                              decoration: BoxDecoration(
-                                color: themeColors.cardColor,
-                                borderRadius: BorderRadius.circular(8.spMin),
-                              ),
-                              child: ListTile(
-                                leading: CircleAvatar(
-                                  backgroundColor: themeColors.cardColor,
-                                  backgroundImage: NetworkImage(imageUrl),
-                                  radius: 32.spMin,
-                                  onBackgroundImageError: (exception, stackTrace) {
-                                    // Handle error silently
-                                  },
-                                  child: imageUrl.isEmpty
-                                      ? Icon(Icons.image, color: Colors.grey[400], size: 20.spMin)
-                                      : null,
+                              return Padding(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 8.spMin,
                                 ),
-                                title: reusableText(
-                                  categoryName,
-                                  16.spMin,
-                                  FontWeight.w500,
-                                  themeColors.primaryTextColor,
-                                  -0.41,
-                                  TextAlign.left,
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 12.spMin,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: themeColors.cardColor,
+                                    borderRadius: BorderRadius.circular(
+                                      8.spMin,
+                                    ),
+                                  ),
+                                  child: ListTile(
+                                    leading: CircleAvatar(
+                                      backgroundColor: themeColors.cardColor,
+                                      backgroundImage: NetworkImage(imageUrl),
+                                      radius: 32.spMin,
+                                      onBackgroundImageError:
+                                          (exception, stackTrace) {
+                                            // Handle error silently
+                                          },
+                                      child: imageUrl.isEmpty
+                                          ? Icon(
+                                              Icons.image,
+                                              color: Colors.grey[400],
+                                              size: 20.spMin,
+                                            )
+                                          : null,
+                                    ),
+                                    title: reusableText(
+                                      categoryName,
+                                      16.spMin,
+                                      FontWeight.w500,
+                                      themeColors.primaryTextColor,
+                                      -0.41,
+                                      TextAlign.left,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                              );
+                            },
+                          ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
         );
       },
     );

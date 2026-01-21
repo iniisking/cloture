@@ -1,5 +1,8 @@
+// ignore_for_file: use_build_context_synchronously, deprecated_member_use
+
 import 'package:cloture/view/screens/authentication/sign_in_screen.dart';
 import 'package:cloture/services/auth_service.dart';
+import 'package:cloture/utils/logger.dart';
 import 'package:cloture/view/constants/colors.dart';
 import 'package:cloture/view/constants/text.dart';
 import 'package:cloture/controller/theme_controller.dart';
@@ -57,7 +60,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           });
         }
       } catch (e) {
-        print('Error loading user data: $e');
+        AppLogger.error('Error loading user data', e);
       }
     }
   }
@@ -87,7 +90,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ? NetworkImage(profileImageUrl!)
                     : null,
                 child: profileImageUrl == null
-                    ? Icon(Icons.person, size: 50.spMin, color: secondaryTextColor)
+                    ? Icon(
+                        Icons.person,
+                        size: 50.spMin,
+                        color: secondaryTextColor,
+                      )
                     : null,
               ),
 

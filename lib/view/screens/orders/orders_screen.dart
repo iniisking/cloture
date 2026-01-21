@@ -1,3 +1,5 @@
+// ignore_for_file: unused_element, deprecated_member_use
+
 import 'package:cloture/gen/assets.gen.dart';
 import 'package:cloture/view/constants/colors.dart';
 import 'package:cloture/view/constants/text.dart';
@@ -97,14 +99,10 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 : null,
           ),
           body: isLoading
-              ? Center(
-                  child: CircularProgressIndicator(
-                    color: primary200,
-                  ),
-                )
+              ? Center(child: CircularProgressIndicator(color: primary200))
               : cartItems.isEmpty
-                  ? _buildEmptyState(themeColors)
-                  : _buildCartState(themeColors, cartController),
+              ? _buildEmptyState(themeColors)
+              : _buildCartState(themeColors, cartController),
         );
       },
     );
@@ -129,7 +127,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
           GestureDetector(
             onTap: () {
               // Navigate to home page (index 0) in bottom nav
-              final bottomNavState = context.findAncestorStateOfType<BottomNavScreenState>();
+              final bottomNavState = context
+                  .findAncestorStateOfType<BottomNavScreenState>();
               if (bottomNavState != null) {
                 bottomNavState.navigateToTab(0);
               }
@@ -158,7 +157,10 @@ class _OrdersScreenState extends State<OrdersScreen> {
     );
   }
 
-  Widget _buildCartState(AppThemeColors themeColors, CartController cartController) {
+  Widget _buildCartState(
+    AppThemeColors themeColors,
+    CartController cartController,
+  ) {
     final subtotal = cartController.subtotal;
     final shippingCost = cartController.shippingCost;
     final tax = cartController.tax;
@@ -210,7 +212,11 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 themeColors,
               ),
               SizedBox(height: 12.spMin),
-              _buildOrderSummaryRow('Tax', '\$${tax.toStringAsFixed(2)}', themeColors),
+              _buildOrderSummaryRow(
+                'Tax',
+                '\$${tax.toStringAsFixed(2)}',
+                themeColors,
+              ),
               SizedBox(height: 16.spMin),
               Divider(color: themeColors.cardColor, thickness: 1),
               SizedBox(height: 16.spMin),
@@ -420,7 +426,11 @@ class _OrdersScreenState extends State<OrdersScreen> {
                         color: primary200,
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(Icons.add, color: themeColors.backgroundColor, size: 18.spMin),
+                      child: Icon(
+                        Icons.add,
+                        color: themeColors.backgroundColor,
+                        size: 18.spMin,
+                      ),
                     ),
                   ),
                 ],
